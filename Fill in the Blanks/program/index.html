@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Section 4 — Fill the Blank by Spelling the Word</title>
+<style>
+  :root{
+    --purple-heading: #5a189a;
+    --overlay: rgba(0,0,0,0.44);
+    --success: #2ecc71;
+    --error: #e74c3c;
+    --fill-highlight: rgba(255,235,59,0.95);
+    --accent: #ff8c42;
+  }
+  html,body{height:100%;margin:0;padding:0;font-family:"Comic Sans MS",cursive;overflow:hidden;}
+  body{
+    background: url("../assets/6140.jpg") no-repeat center center fixed;
+    background-size: cover;
+  }
+
+  /* dim overlay so content pops */
+  #overlay{position:fixed; inset:0; background:var(--overlay); z-index:0; pointer-events:none;}
+
+  /* UI sits directly on the dimmed background */
+  .ui { position:relative; z-index:10; width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:20px; box-sizing:border-box; }
+  .panel { width:92%; max-width:980px; display:flex; flex-direction:column; align-items:center; gap:12px; pointer-events:auto; }
+
+  h1 { margin:0; color:var(--purple-heading); font-size:28px; text-shadow:1px 1px 8px rgba(0,0,0,0.2); }
+
+  /* Slide */
+  .slide { display:none; width:100%; align-items:center; justify-content:center; flex-direction:column; gap:12px; padding:8px 6px; }
+  .slide.active { display:flex; animation:fadeIn .36s ease; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
+
+  .prompt { color: #fff; font-weight:800; font-size:20px; text-align:center; max-width:90%; text-shadow:1px 1px 8px rgba(0,0,0,0.6); }
+
+  .blanks { display:flex; gap:12px; align-items:center; justify-content:center; flex-wrap:wrap; }
+
+  .letter-box {
+    width:74px; height:78px; border-radius:10px;
+    background: rgba(255,255,255,0.98);
+    display:flex; align-items:center; justify-content:center;
+    font-size:34px; font-weight:900; color:#222;
+    border:3px solid transparent;
+    box-shadow:0 12px 22px rgba(0,0,0,0.08);
+    transition: transform .12s ease, border-color .12s ease, box-shadow .12s;
+  }
+  .letter-box.correct { border-color: var(--success); box-shadow:0 14px 36px rgba(46,204,113,0.12); transform:translateY(-6px) scale(1.02); }
+  .letter-box.wrong { border-color: var(--error); animation:smallShake .36s; }
+  @keyframes smallShake { 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)} 100%{transform:none} }
+
+  .letter-input { width:100%; height:100%; border:0; outline:none; background:transparent; font-size:34px; font-weight:900; text-align:center; text-transform:uppercase; caret-color:var(--accent); }
+
+  .controls { display:flex; gap:12px; justify-content:center; margin-top:6px; }
+  button { background:var(--accent); color:#fff; border:0; padding:10px 16px; font-weight:800; border-radius:10px; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.18); }
+  button.secondary { background:transparent; border:2px solid rgba(255,255,255,0.12); color:#fff; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+
+  .message { margin-top:8px; min-height:28px; font-weight:800; font-size:18px; color:#fff; text-shadow:1px 1px 6px rgba(0,0,0,0.6); }
+
+  .filled-word { display:inline-block; padding:2px 6px; border-radius:6px; background:var(--fill-highlight); color:#111; font-weight:900; box-shadow:0 8px 18px rgba(0,0,0,0.18); }
+
+  /* confetti */
+  .confetti { position:fixed; top:-10px; z-index:9999; pointer-events:none; border-radius:2px; animation:fall linear forwards; }
+  .confetti[data-shape="circle"]{ border-radius:50%; }
+  .confetti[data-shape="star"]{ clip-path: polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+  @keyframes fall { to { transform: translateY(100vh) rotate(720deg); opacity:0 } }
+
+  @media (max-width:720px){ .letter-box{ width:60px; height:64px; font-size:26px } h1{ font-size:22px } }
+</style>
+</head>
+<body>
+  <div id="overlay"></div>
+
+  <div class="ui" role="application" aria-label="Spelling activity on background">
+    <div class="panel">
+      <h1>Fill the Blank by Spelling the Word!</h1>
+
+      <div id="slidesContainer"></div>
+
+      <div class="controls" aria-hidden="false">
+        <button id="prevBtn" class="secondary">⬅ Previous</button>
+        <button id="nextBtn" class="secondary">Next ➡</button>
+        <button id="checkBtn">Check</button>
+      </div>
+
+      <div class="message" id="globalMessage" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- optional success / error sounds (if you have them in ../assets/) -->
+  <audio id="successSound" src="../assets/success-340660.mp3" preload="auto"></audio>
+  <audio id="errorSound" src="../assets/error-126627.mp3" preload="auto"></audio>
+
+<script>
+/* ===== QUESTIONS (final confirmed) ===== */
+const QUESTIONS = [
+  { template: "A frog can live both on {blank} and in water", answer: "LAND" },
+  { template: "Some animals like dog live in {blank} shelters", answer: "KENNEL" },
+  { template: "Aquatic animals live in {blank}", answer: "WATER" },
+  { template: "Bears eat both {blank} and the flesh of other animals", answer: "PLANTS" },
+  { template: "Birds fly with the help of their {blank}", answer: "WINGS" }
+];
+
+/* DOM refs */
+const slidesContainer = document.getElementById("slidesContainer");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const checkBtn = document.getElementById("checkBtn");
+const globalMessage = document.getElementById("globalMessage");
+
+/* TTS: Speak spelled letters then speak full word */
+function speakWordSmart(word) {
+  if (!word || word.trim() === "") return;
+  const synth = window.speechSynthesis;
+  // letters: separate by space so browser spells them
+  const letters = word.split("").join(" ");
+  const spell = new SpeechSynthesisUtterance(letters);
+  spell.rate = 0.9;
+  spell.pitch = 1.2;
+  const sayWord = new SpeechSynthesisUtterance(word);
+  sayWord.rate = 0.95;
+  sayWord.pitch = 1.05;
+  spell.onend = () => synth.speak(sayWord);
+  // cancel any ongoing speech to avoid overlap
+  synth.cancel();
+  synth.speak(spell);
+}
+
+/* Speak single letter (immediate feedback on typing) */
+function speakLetter(ch) {
+  if (!ch) return;
+  const synth = window.speechSynthesis;
+  const u = new SpeechSynthesisUtterance(ch.toUpperCase());
+  u.rate = 0.95;
+  u.pitch = 1.2;
+  synth.cancel();
+  synth.speak(u);
+}
+
+/* confetti burst */
+function confettiBurst(count=90) {
+  const shapes = ["square","circle","star"];
+  for (let i=0;i<count;i++){
+    const el = document.createElement("div");
+    el.className = "confetti";
+    el.dataset.shape = shapes[Math.floor(Math.random()*shapes.length)];
+    const size = 6 + Math.random()*14;
+    el.style.width = el.style.height = size + "px";
+    el.style.left = Math.random()*100 + "vw";
+    el.style.background = `hsl(${Math.random()*360},85%,55%)`;
+    el.style.animationDuration = (1.6 + Math.random()*1.6) + "s";
+    document.body.appendChild(el);
+    setTimeout(()=> el.remove(), 4200);
+  }
+}
+
+/* build slides dynamically */
+const slides = [];
+QUESTIONS.forEach((q, idx) => {
+  const slide = document.createElement("div");
+  slide.className = "slide";
+  slide.dataset.answer = q.answer.toUpperCase();
+  slide.dataset.template = q.template;
+
+  // prompt: underscores initially
+  const blanksStr = Array.from({length: q.answer.length}, ()=>"_").join(" ");
+  const prompt = document.createElement("div");
+  prompt.className = "prompt";
+  prompt.innerHTML = q.template.replace("{blank}", `<span class="blank-underscores">${blanksStr}</span>`);
+  slide.appendChild(prompt);
+
+  // blanks (letter boxes)
+  const blanks = document.createElement("div");
+  blanks.className = "blanks";
+  for (let i=0;i<q.answer.length;i++){
+    const box = document.createElement("div");
+    box.className = "letter-box";
+    box.dataset.index = i;
+
+    const input = document.createElement("input");
+    input.className = "letter-input";
+    input.type = "text";
+    input.maxLength = 1;
+    input.autocomplete = "off";
+    input.inputMode = "text";
+    input.setAttribute("aria-label", `Letter ${i+1} of ${q.answer.length}`);
+
+    // on input: speak letter, mark correctness, auto-advance
+    input.addEventListener("input", (e) => {
+      const ch = (e.target.value || "").charAt(0);
+      e.target.value = ch.toUpperCase();
+      if (ch) {
+        speakLetter(ch);
+        const expected = q.answer.charAt(i).toUpperCase();
+        if (ch.toUpperCase() === expected) {
+          box.classList.add("correct");
+          box.classList.remove("wrong");
+        } else {
+          box.classList.add("wrong");
+          setTimeout(()=> box.classList.remove("wrong"), 450);
+        }
+        // move to next
+        const nextBox = box.nextElementSibling;
+        if (nextBox) {
+          const nextInp = nextBox.querySelector(".letter-input");
+          if (nextInp) nextInp.focus();
+        }
+      } else {
+        box.classList.remove("correct","wrong");
+      }
+
+      // auto-check when all filled
+      const inputs = slide.querySelectorAll(".letter-input");
+      const allFilled = Array.from(inputs).every(x => x.value && x.value.length>0);
+      if (allFilled) setTimeout(()=> checkSlide(idx), 240);
+    });
+
+    // keyboard navigation
+    input.addEventListener("keydown", (ev) => {
+      if (ev.key === "Backspace" && ev.target.value === "") {
+        const prev = box.previousElementSibling;
+        if (prev) prev.querySelector(".letter-input").focus();
+      }
+      if (ev.key === "Enter") checkSlide(idx);
+    });
+
+    box.appendChild(input);
+    blanks.appendChild(box);
+  }
+  slide.appendChild(blanks);
+
+  // message node
+  const msg = document.createElement("div");
+  msg.className = "message";
+  slide.appendChild(msg);
+
+  slides.push(slide);
+  slidesContainer.appendChild(slide);
+});
+
+/* navigation state */
+let current = 0;
+function showSlide(i) {
+  slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
+  current = i;
+  prevBtn.disabled = i === 0;
+  nextBtn.disabled = i === slides.length - 1;
+  // focus first input
+  setTimeout(()=> {
+    const first = slides[i].querySelector(".letter-input");
+    if (first) { first.focus(); first.select(); }
+  }, 70);
+  globalMessage.innerText = "";
+}
+
+/* auto-clear when navigating back (and when showing slide) */
+function autoClear(index) {
+  const slide = slides[index];
+  if (!slide) return;
+  // clear inputs + classes + message
+  slide.querySelectorAll(".letter-input").forEach(i => i.value = "");
+  slide.querySelectorAll(".letter-box").forEach(b => b.classList.remove("correct","wrong"));
+  slide.querySelector(".message").innerText = "";
+  // restore underscores in prompt if it had been filled
+  const answer = slide.dataset.answer;
+  const underscores = Array.from({length: answer.length}, ()=>"_").join(" ");
+  const template = slide.dataset.template;
+  slide.querySelector(".prompt").innerHTML = template.replace("{blank}", `<span class="blank-underscores">${underscores}</span>`);
+}
+
+/* Prev/Next handlers with auto-clear on prev */
+prevBtn.addEventListener("click", () => {
+  if (current > 0) {
+    // clear the previous slide we are moving to (so it's fresh)
+    autoClear(current - 1);
+    showSlide(current - 1);
+  }
+});
+nextBtn.addEventListener("click", () => {
+  if (current < slides.length - 1) {
+    showSlide(current + 1);
+  }
+});
+checkBtn.addEventListener("click", () => checkSlide(current));
+
+/* initial show */
+showSlide(0);
+
+/* check function: validates and reacts accordingly */
+function checkSlide(index) {
+  const slide = slides[index];
+  const answer = slide.dataset.answer.toUpperCase();
+  const inputs = Array.from(slide.querySelectorAll(".letter-input"));
+  const entered = inputs.map(i => (i.value || "").toUpperCase()).join("");
+  const msg = slide.querySelector(".message");
+
+  if (entered.length !== answer.length) {
+    msg.innerText = "Please fill all letters.";
+    speakLetter("Please");
+    return;
+  }
+
+  // always pronounce what they typed (letters + full typed word)
+  speakWordSmart(entered);
+
+  if (entered === answer) {
+    // success
+    msg.innerText = `Great job! You spelled ${answer} correctly!`;
+    msg.className = "message";
+    inputs.forEach(inp => inp.parentElement.classList.add("correct"));
+    try { document.getElementById("successSound").currentTime = 0; document.getElementById("successSound").play(); } catch(e){}
+    confettiBurst(110);
+
+    // fill the {blank} in prompt with highlighted word (Option B)
+    const template = slide.dataset.template;
+    slide.querySelector(".prompt").innerHTML = template.replace("{blank}", `<span class="filled-word">${answer}</span>`);
+
+    // auto advance short delay
+    setTimeout(()=> {
+      if (current < slides.length - 1) showSlide(current + 1);
+    }, 1000);
+
+  } else {
+    // wrong
+    msg.innerText = "❌ Try again!";
+    msg.className = "message";
+    inputs.forEach(inp => inp.parentElement.classList.add("wrong"));
+    try { document.getElementById("errorSound").currentTime = 0; document.getElementById("errorSound").play(); } catch(e){}
+    // remove wrong class after short time so they can retry
+    setTimeout(()=> inputs.forEach(inp => inp.parentElement.classList.remove("wrong")), 700);
+  }
+}
+
+/* small wrapper confetti (used on correct) */
+function confettiBurst(count=90) {
+  const shapes = ["square","circle","star"];
+  for (let i=0;i<count;i++){
+    const el = document.createElement("div");
+    el.className = "confetti";
+    el.dataset.shape = shapes[Math.floor(Math.random()*shapes.length)];
+    const size = 6 + Math.random()*14;
+    el.style.width = el.style.height = size + "px";
+    el.style.left = Math.random()*100 + "vw";
+    el.style.background = `hsl(${Math.random()*360},85%,55%)`;
+    el.style.animationDuration = (1.6 + Math.random()*1.6) + "s";
+    document.body.appendChild(el);
+    setTimeout(()=> el.remove(), 4200);
+  }
+}
+
+/* ensure TTS voices load on browsers */
+if (typeof speechSynthesis !== "undefined") {
+  speechSynthesis.onvoiceschanged = () => {};
+}
+
+/* click a letter box to focus input inside */
+slidesContainer.addEventListener("click", (e) => {
+  const box = e.target.closest(".letter-box");
+  if (!box) return;
+  const inp = box.querySelector(".letter-input");
+  if (inp) { inp.focus(); inp.select(); }
+});
+</script>
+</body>
+</html>

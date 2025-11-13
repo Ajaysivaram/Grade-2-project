@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Match the Following</title>
+
+<style>
+/* ================== GLOBAL ================== */
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  overflow:hidden;
+  font-family:"Comic Sans MS",cursive;
+}
+body{
+  background:url("../assets/6140.jpg") no-repeat center center fixed;
+  background-size:cover;
+}
+
+/* dim layer */
+#overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.50);
+  z-index:0;
+}
+
+/* ================== MAIN CONTAINER ================== */
+.container{
+  position:relative;
+  z-index:10;
+  width:90%;
+  max-width:900px;
+  margin:8px auto;
+  padding:10px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(5px);
+  box-shadow:0 5px 25px rgba(0,0,0,0.35);
+}
+
+h1{
+  text-align:center;
+  color:#fff;
+  font-size:26px;
+  margin-bottom:6px;
+  text-shadow:2px 2px 10px black;
+}
+
+/* ================== MATCHING BODY ================== */
+.game{
+  position:relative;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:50px;
+  padding:5px 10px;
+}
+
+#leftSide,#rightSide{
+  width:240px;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ================== ITEM ================== */
+.item{
+  background:white;
+  margin:6px 0;
+  padding:8px 10px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  cursor:pointer;
+  border:2px solid rgba(0,0,0,0.1);
+  box-shadow:0 4px 15px rgba(0,0,0,0.12);
+  transition:0.15s;
+  user-select:none;
+  z-index:5;
+}
+
+.item:hover{
+  transform:translateY(-4px);
+  box-shadow:0 8px 18px rgba(0,0,0,0.25);
+}
+
+.item.selected{
+  border-color:#6fb6ff;
+  transform:scale(1.03);
+}
+
+.item.locked{
+  opacity:0.45;
+  cursor:default;
+}
+
+.item img{
+  width:70px;
+  height:55px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.item span{
+  font-size:16px;
+  font-weight:700;
+  color:#333;
+}
+
+/* WRONG ANIMATION */
+.item.wrong{
+  border-color:#ff5a5a !important;
+  animation:shake 0.5s;
+}
+@keyframes shake{
+  25%{transform:translateX(-5px);}
+  75%{transform:translateX(5px);}
+}
+
+/* small badge */
+.badge{
+  margin-left:auto;
+  background:#d2ffd2;
+  padding:4px 8px;
+  border-radius:20px;
+  font-weight:800;
+  color:green;
+}
+
+/* ================== CANVAS ================== */
+#lineCanvas{
+  position:absolute;
+  top:0; left:0;
+  pointer-events:none;
+  z-index:1;
+}
+
+/* ================== RESET BUTTON ================== */
+#resetBtn{
+  margin-top:6px;
+  padding:8px 18px;
+  font-size:16px;
+  font-weight:700;
+  border:none;
+  border-radius:10px;
+  background:#ff8800;
+  color:white;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,0.25);
+}
+#resetBtn:hover{
+  background:#ff9d33;
+}
+
+/* ================== CONFETTI ================== */
+.confetti{
+  position:fixed;
+  top:-10px;
+  z-index:9999;
+  pointer-events:none;
+  border-radius:2px;
+  animation:confettiFall linear forwards;
+}
+.confetti[data-shape="circle"]{ border-radius:50%; }
+.confetti[data-shape="star"]{
+  clip-path:polygon(
+      50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,
+      50% 70%,21% 91%,32% 57%,2% 35%,39% 35%
+  );
+}
+@keyframes confettiFall{
+  0%{ transform:translateY(0) rotate(0deg) scale(1); opacity:1; }
+  100%{ transform:translateY(100vh) rotate(720deg) scale(.9); opacity:0; }
+}
+</style>
+</head>
+
+<body>
+<div id="overlay"></div>
+
+<div class="container">
+  <h1>Tap One on the Left, Tap One on the Right And Match a Pair</h1>
+
+  <div class="game" id="game">
+
+    <!-- LEFT -->
+    <div id="leftSide">
+      <div class="item" data-key="sheep"><img src="../assets/sheep.jpg"><span>Sheep</span></div>
+      <div class="item" data-key="insects"><img src="../assets/insects.jpg"><span>Insects</span></div>
+      <div class="item" data-key="leather"><img src="../assets/leather.jpg"><span>Leather</span></div>
+      <div class="item" data-key="yak"><img src="../assets/yak.jpg"><span>Yak</span></div>
+      <div class="item" data-key="seal"><img src="../assets/seal.jpg"><span>Seal</span></div>
+    </div>
+
+    <!-- RIGHT -->
+    <div id="rightSide">
+      <div class="item" data-key="sixlegs"><img src="../assets/sixlegs.jpg"><span>Six Legs</span></div>
+      <div class="item" data-key="shoes"><img src="../assets/shoes.jpg"><span>Shoes</span></div>
+      <div class="item" data-key="wool"><img src="../assets/wool.jpg"><span>Wool</span></div>
+      <div class="item" data-key="water"><img src="../assets/water.jpg"><span>Water</span></div>
+      <div class="item" data-key="mountains"><img src="../assets/mountains.jpg"><span>Mountains</span></div>
+    </div>
+
+    <canvas id="lineCanvas"></canvas>
+  </div>
+
+  <div style="text-align:center;">
+    <button id="resetBtn">RESET</button>
+  </div>
+
+</div>
+
+<!-- sounds -->
+<audio id="correctSound" src="../assets/success.mp3"></audio>
+<audio id="wrongSound" src="../assets/error-126627.mp3"></audio>
+
+<script>
+const pairs={ sheep:"wool", insects:"sixlegs", leather:"shoes", yak:"mountains", seal:"water" };
+const colors={ sheep:"green", insects:"orange", leather:"blue", yak:"brown", seal:"purple" };
+
+const leftItems=[...document.querySelectorAll("#leftSide .item")];
+const rightItems=[...document.querySelectorAll("#rightSide .item")];
+const game=document.getElementById("game");
+const canvas=document.getElementById("lineCanvas");
+const ctx=canvas.getContext("2d");
+const correctSound=document.getElementById("correctSound");
+const wrongSound=document.getElementById("wrongSound");
+const resetBtn=document.getElementById("resetBtn");
+
+let selectedLeft=null;
+let finished=[];
+
+/* anchor points */
+function leftAnchor(el){
+  const img=el.querySelector("img");
+  const r=img.getBoundingClientRect();
+  const g=game.getBoundingClientRect();
+  return { x:r.right-g.left, y:r.top-g.top+r.height/2 };
+}
+function rightAnchor(el){
+  const img=el.querySelector("img");
+  const r=img.getBoundingClientRect();
+  const g=game.getBoundingClientRect();
+  return { x:r.left-g.left, y:r.top-g.top+r.height/2 };
+}
+
+/* canvas resize */
+function resizeCanvas(){
+  const r=game.getBoundingClientRect();
+  canvas.width=r.width;
+  canvas.height=r.height;
+  redraw();
+}
+resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
+
+/* curve drawing */
+function drawCurve(s,e,color,p=1){
+  ctx.save();
+  ctx.strokeStyle=color;
+  ctx.lineWidth=4;
+  ctx.lineCap="round";
+  ctx.beginPath();
+  ctx.moveTo(s.x,s.y);
+
+  const cx=(s.x+e.x)/2;
+  const cy=(s.y+e.y)/2 - Math.abs(e.x-s.x)*0.12;
+
+  const steps=30;
+  for(let i=0;i<=steps*p;i++){
+    let t=i/steps;
+    let x=(1-t)**2*s.x + 2*(1-t)*t*cx + t*t*e.x;
+    let y=(1-t)**2*s.y + 2*(1-t)*t*cy + t*t*e.y;
+    ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function redraw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  finished.forEach(f=> drawCurve(leftAnchor(f.left), rightAnchor(f.right), f.color,1));
+}
+
+/* confetti */
+function confetti(){
+  const total=80;
+  const shapes=["square","circle","star"];
+  for(let i=0;i<total;i++){
+    const d=document.createElement("div");
+    d.className="confetti";
+    d.dataset.shape=shapes[Math.floor(Math.random()*shapes.length)];
+    d.style.width=d.style.height=(6+Math.random()*10)+"px";
+    d.style.left=Math.random()*100+"vw";
+    d.style.background=`hsl(${Math.random()*360},90%,55%)`;
+    d.style.animationDuration=(1.5+Math.random()*1.5)+"s";
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),3500);
+  }
+}
+
+function mega(){
+  confetti();
+  setTimeout(confetti,300);
+  setTimeout(confetti,600);
+}
+
+/* animate line */
+function animateLine(l,r,color){
+  const s=leftAnchor(l);
+  const e=rightAnchor(r);
+  let p=0;
+  function step(){
+    p+=0.03;
+    redraw();
+    drawCurve(s,e,color,p);
+    if(p<1) requestAnimationFrame(step);
+    else{
+      finished.push({left:l,right:r,color});
+      if(finished.length===5) mega();
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+/* CLICK HANDLING */
+leftItems.forEach(li=>{
+  li.addEventListener("click",()=>{
+    if(li.classList.contains("locked")) return;
+    leftItems.forEach(i=>i.classList.remove("selected"));
+    li.classList.add("selected");
+    selectedLeft=li;
+  });
+});
+
+rightItems.forEach(ri=>{
+  ri.addEventListener("click",()=>{
+    if(!selectedLeft) return;
+
+    const L=selectedLeft.dataset.key;
+    const R=ri.dataset.key;
+
+    if(pairs[L]===R){
+      correctSound.play();
+      confetti();
+
+      selectedLeft.classList.add("locked");
+      ri.classList.add("locked");
+
+      selectedLeft.appendChild(Object.assign(document.createElement("span"),{className:"badge",innerText:"✓"}));
+      ri.appendChild(Object.assign(document.createElement("span"),{className:"badge",innerText:"✓"}));
+
+      animateLine(selectedLeft,ri,colors[L]);
+
+      selectedLeft.classList.remove("selected");
+      selectedLeft=null;
+    }
+    else{
+      wrongSound.play();
+      ri.classList.add("wrong");
+      selectedLeft.classList.add("wrong");
+      setTimeout(()=>{
+        ri.classList.remove("wrong");
+        selectedLeft.classList.remove("wrong");
+      },500);
+    }
+  });
+});
+
+/* RESET BUTTON */
+resetBtn.onclick=function(){
+  finished=[];
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  [...leftItems,...rightItems].forEach(i=>{
+    i.classList.remove("locked","selected","wrong");
+    const badge=i.querySelector(".badge");
+    if(badge) badge.remove();
+  });
+  selectedLeft=null;
+};
+</script>
+</body>
+</html>

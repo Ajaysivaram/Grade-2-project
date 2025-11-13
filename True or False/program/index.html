@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Section II — True or False</title>
+
+<style>
+/* No scrolling */
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Background image (not dimmed directly) */
+body {
+  font-family: "Comic Sans MS", cursive;
+  background: url("../assets/6140.jpg") no-repeat center center fixed;
+  background-size: cover;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ⭐ Dark overlay ONLY for background */
+.bg-dim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1;
+}
+
+/* Auto-scale container */
+.scale-container {
+  transform-origin: top center;
+  width: 1000px;
+  height: 650px;
+  position: relative;
+  z-index: 10;
+}
+
+/* Quiz content */
+.quiz {
+  width: 100%;
+  height: 100%;
+  color: white;
+  text-shadow: 2px 2px 8px black;
+}
+
+/* Heading */
+h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+/* Question slides */
+.question {
+  display: none;
+  position: absolute;
+  top: 90px;
+  width: 100%;
+}
+
+.question.active {
+  display: block;
+  animation: fadeIn .4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: none; }
+}
+
+.q-text {
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+/* Image wrapper */
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* ⭐ FIXED IMAGE SIZE */
+.q-image {
+  width: 350px;
+  height: 260px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 14px 50px rgba(0,0,0,0.6);
+}
+
+.q-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* TRUE/FALSE buttons */
+.tf-row {
+  margin-top: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+}
+
+.tf-btn {
+  width: 200px;
+  padding: 15px;
+  font-size: 22px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: white;
+  background: rgba(0,0,0,0.4);
+  border: 3px solid white;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.tf-btn:hover {
+  transform: scale(1.08);
+  background: rgba(0,0,0,0.6);
+}
+
+.tf-btn img {
+  width: 40px;
+  height: 40px;
+}
+
+.tf-correct {
+  border-color: #2ecc71 !important;
+  background: rgba(46,204,113,0.3);
+  box-shadow: 0 0 18px #2ecc71;
+}
+
+.tf-wrong {
+  border-color: #e74c3c !important;
+  background: rgba(231,76,60,0.3);
+}
+
+.message {
+  margin-top: 10px;
+  font-size: 24px;
+  min-height: 32px;
+}
+
+/* NEXT / PREVIOUS buttons */
+.nav-btn {
+  position: absolute;
+  top: 260px;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.55);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  font-size: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: .25s;
+}
+
+#prevBtn { left: 40px; }
+#nextBtn { right: 40px; }
+
+.nav-btn:hover {
+  background: rgba(0,0,0,0.8);
+  transform: translateY(-50%) scale(1.08);
+}
+
+/* Confetti */
+.confetti {
+  position: fixed;
+  top: -10px;
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  animation: confFall linear forwards;
+  z-index: 99999;
+}
+
+@keyframes confFall {
+  to {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ⭐ Dark Layer Behind Content -->
+<div class="bg-dim"></div>
+
+<div class="scale-container">
+<div class="quiz">
+
+<h1>Section II — True/False</h1>
+
+<!-- Q1 -->
+<div class="question active" data-answer="false">
+  <div class="q-text">Domestic animals live in the forests.</div>
+  <div class="image-wrapper">
+    <div class="q-image"><img src="../assets/Domestic.jpg"></div>
+  </div>
+  <div class="tf-row">
+    <button class="tf-btn" data-value="true"><img src="../assets/true.png">TRUE</button>
+    <button class="tf-btn" data-value="false"><img src="../assets/false.png">FALSE</button>
+  </div>
+  <div class="message"></div>
+</div>
+
+<!-- Q2 -->
+<div class="question" data-answer="false">
+  <div class="q-text">Ostriches can fly.</div>
+  <div class="image-wrapper">
+    <div class="q-image"><img src="../assets/ostrich.jpg"></div>
+  </div>
+  <div class="tf-row">
+    <button class="tf-btn" data-value="true"><img src="../assets/true.png">TRUE</button>
+    <button class="tf-btn" data-value="false"><img src="../assets/false.png">FALSE</button>
+  </div>
+  <div class="message"></div>
+</div>
+
+<!-- Q3 -->
+<div class="question" data-answer="false">
+  <div class="q-text">Aquatic animals live on land.</div>
+  <div class="image-wrapper">
+    <div class="q-image"><img src="../assets/aquatic.jpg"></div>
+  </div>
+  <div class="tf-row">
+    <button class="tf-btn" data-value="true"><img src="../assets/true.png">TRUE</button>
+    <button class="tf-btn" data-value="false"><img src="../assets/false.png">FALSE</button>
+  </div>
+  <div class="message"></div>
+</div>
+
+<!-- Q4 -->
+<div class="question" data-answer="false">
+  <div class="q-text">A duck doesn't live in water.</div>
+  <div class="image-wrapper">
+    <div class="q-image"><img src="../assets/duck.jpg"></div>
+  </div>
+  <div class="tf-row">
+    <button class="tf-btn" data-value="true"><img src="../assets/true.png">TRUE</button>
+    <button class="tf-btn" data-value="false"><img src="../assets/false.png">FALSE</button>
+  </div>
+  <div class="message"></div>
+</div>
+
+<!-- Q5 -->
+<div class="question" data-answer="true">
+  <div class="q-text">Some animals eat both plants and meat.</div>
+  <div class="image-wrapper">
+    <div class="q-image"><img src="../assets/omnivore.jpg"></div>
+  </div>
+  <div class="tf-row">
+    <button class="tf-btn" data-value="true"><img src="../assets/true.png">TRUE</button>
+    <button class="tf-btn" data-value="false"><img src="../assets/false.png">FALSE</button>
+  </div>
+  <div class="message"></div>
+</div>
+
+<!-- Navigation buttons -->
+<button id="prevBtn" class="nav-btn">Previous</button>
+<button id="nextBtn" class="nav-btn">Next</button>
+
+</div>
+</div>
+
+<!-- Audio -->
+<audio id="correctSound" src="../assets/success-340660.mp3"></audio>
+<audio id="wrongSound" src="../assets/error-126627.mp3"></audio>
+
+<script>
+/* Auto-scale */
+function scaleQuiz(){
+  let baseW = 1000, baseH = 650;
+  let scale = Math.min(window.innerWidth/baseW, window.innerHeight/baseH);
+  document.querySelector(".scale-container").style.transform = `scale(${scale})`;
+}
+scaleQuiz();
+window.onresize = scaleQuiz;
+
+/* Navigation */
+const questions=[...document.querySelectorAll(".question")];
+let index=0;
+
+const prevBtn=document.getElementById("prevBtn");
+const nextBtn=document.getElementById("nextBtn");
+
+function show(i){
+  questions.forEach((q,j)=>q.classList.toggle("active",j===i));
+  prevBtn.style.visibility = i===0 ? "hidden":"visible";
+  nextBtn.style.visibility = i===questions.length-1 ? "hidden":"visible";
+}
+show(index);
+
+prevBtn.onclick=()=>{ if(index>0){ index--; show(index);} }
+nextBtn.onclick=()=>{ if(index<questions.length-1){ index++; show(index);} }
+
+/* Answer checking + auto-move */
+questions.forEach((q, qIndex) => {
+  const correct=q.dataset.answer;
+  const msg=q.querySelector(".message");
+  const btns=[...q.querySelectorAll(".tf-btn")];
+
+  btns.forEach(btn=>{
+    btn.onclick=()=>{
+      btns.forEach(b=>b.classList.remove("tf-correct","tf-wrong"));
+
+      if(btn.dataset.value===correct){
+        btn.classList.add("tf-correct");
+        msg.textContent="🎉 Correct!";
+        msg.style.color="#2ecc71";
+        correctSound.play();
+        confetti();
+
+        /* ⭐AUTO SLIDE⭐ */
+        setTimeout(()=>{
+          if(qIndex < questions.length - 1){
+            index = qIndex + 1;
+            show(index);
+          }
+        },1000);
+
+      } else {
+        btn.classList.add("tf-wrong");
+        msg.textContent="❌ Try Again!";
+        msg.style.color="red";
+        wrongSound.play();
+      }
+    };
+  });
+});
+
+/* Confetti */
+function confetti(){
+  for(let i=0;i<60;i++){
+    let c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    c.style.animationDuration=1.8+Math.random()*1.5+"s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3500);
+  }
+}
+</script>
+
+</body>
+</html>
