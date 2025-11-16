@@ -3,297 +3,239 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Section II — True or False</title>
+<title>True or False</title>
 
 <style>
-/* No scrolling */
 html, body {
   margin: 0;
   height: 100%;
   overflow: hidden;
+  font-family: "Comic Sans MS", cursive;
 }
 
-/* Background image (not dimmed directly) */
+/* Background with board image */
 body {
-  font-family: "Comic Sans MS", cursive;
-  background: url("../Assets/6140.jpg") no-repeat center center fixed;
-  background-size: cover;
-  text-align: center;
+  background: url("../Assets/10f3fd2f-d214-456e-93e2-b94328e751bd.jpg") no-repeat center center;
+  background-size: contain;
+  background-color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-/* ⭐ Dark overlay ONLY for background */
-.bg-dim {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  z-index: 1;
-}
-
-/* Auto-scale container */
-.scale-container {
-  transform-origin: top center;
-  width: 1000px;
-  height: 650px;
-  position: relative;
-  z-index: 10;
-}
-
-/* Quiz content */
-.quiz {
+/* MAIN BOARD AREA */
+.board-area {
   width: 100%;
   height: 100%;
-  color: white;
-  text-shadow: 2px 2px 8px black;
-}
-
-/* Heading */
-h1 {
-  margin: 0;
-  font-size: 32px;
-}
-
-/* Question slides */
-.question {
-  display: none;
-  position: absolute;
-  top: 90px;
-  width: 100%;
-}
-
-.question.active {
-  display: block;
-  animation: fadeIn .4s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(25px); }
-  to { opacity: 1; transform: none; }
-}
-
-.q-text {
-  font-size: 26px;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-/* Image wrapper */
-.image-wrapper {
   position: relative;
-  width: 100%;
-  display: flex;
-  justify-content: center;
 }
 
-/* ⭐ FIXED IMAGE SIZE */
+/* CONTENT INSIDE THE BOARD */
+.board-content {
+  position: absolute;
+  top: 41%;  
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46%;
+  text-align: center;
+  z-index: 20;
+}
+
+/* Question text */
+.q-text {
+  font-size: 28px;
+  margin-bottom: 12px;
+  font-weight: bold;
+  line-height: 1.3;
+}
+
+/* Image */
 .q-image {
-  width: 350px;
-  height: 260px;
-  border-radius: 15px;
+  width: 240px;
+  height: 150px;
+  margin: 0 auto 12px auto;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 14px 50px rgba(0,0,0,0.6);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
 }
-
 .q-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* TRUE/FALSE buttons */
+/* TRUE/FALSE */
 .tf-row {
-  margin-top: 25px;
+  margin-top: 10px;
   display: flex;
   justify-content: center;
   gap: 25px;
 }
 
 .tf-btn {
-  width: 200px;
-  padding: 15px;
+  width: 170px;
+  padding: 12px;
   font-size: 22px;
+  border-radius: 12px;
+  border: 3px solid black;
+  background: white;
+  cursor: pointer;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
-  color: white;
-  background: rgba(0,0,0,0.4);
-  border: 3px solid white;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: .25s;
+  gap: 12px;
 }
-
-.tf-btn:hover {
-  transform: scale(1.08);
-  background: rgba(0,0,0,0.6);
-}
-
-.tf-btn img {
-  width: 40px;
-  height: 40px;
-}
+.tf-btn img { width: 30px; height: 30px; }
 
 .tf-correct {
-  border-color: #2ecc71 !important;
-  background: rgba(46,204,113,0.3);
-  box-shadow: 0 0 18px #2ecc71;
+  background: #b6ffb6;
+  border-color: green;
+  box-shadow: 0 0 12px green;
 }
-
 .tf-wrong {
-  border-color: #e74c3c !important;
-  background: rgba(231,76,60,0.3);
+  background: #ffbcbc;
+  border-color: red;
 }
 
+/* Message */
 .message {
-  margin-top: 10px;
-  font-size: 24px;
-  min-height: 32px;
+  font-size: 22px;
+  font-weight: bold;
+  min-height: 30px;
+  margin-top: 8px;
 }
 
-/* NEXT / PREVIOUS buttons */
-.nav-btn {
+/* ⭐ THICK ARROW BUTTONS */
+.nav-out-btn {
   position: absolute;
-  top: 260px;
+  top: 50%;
   transform: translateY(-50%);
-  background: rgba(0,0,0,0.55);
-  color: white;
-  border: none;
-  padding: 12px 22px;
-  font-size: 20px;
-  border-radius: 8px;
+  padding: 18px 40px;
+  font-size: 42px;   /* BIG */
+  font-weight: bold;
+  border: 3px solid black;
+  border-radius: 14px;
   cursor: pointer;
-  transition: .25s;
+  z-index: 200;
+  background: white;
 }
 
-#prevBtn { left: 40px; }
-#nextBtn { right: 40px; }
-
-.nav-btn:hover {
-  background: rgba(0,0,0,0.8);
-  transform: translateY(-50%) scale(1.08);
-}
+#prevBtn { left: 2%; }
+#nextBtn { right: 2%; }
 
 /* Confetti */
 .confetti {
   position: fixed;
-  top: -10px;
   width: 10px;
-  height: 14px;
-  border-radius: 2px;
-  animation: confFall linear forwards;
-  z-index: 99999;
+  height: 12px;
+  border-radius: 3px;
+  top: -10px;
+  animation: fall linear forwards;
+  z-index: 9999;
+}
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
 }
 
-@keyframes confFall {
-  to {
-    transform: translateY(110vh) rotate(720deg);
-    opacity: 0;
-  }
-}
+/* Question block */
+.question { display: none; }
+.question.active { display: block; }
 </style>
 </head>
 
 <body>
 
-<!-- ⭐ Dark Layer Behind Content -->
-<div class="bg-dim"></div>
+<div class="board-area">
 
-<div class="scale-container">
-<div class="quiz">
+<!-- ⭐ THICK ARROW NAV BUTTONS -->
+<button id="prevBtn" class="nav-out-btn">⬅</button>
+<button id="nextBtn" class="nav-out-btn">➡</button>
 
-<h1>Section II — True/False</h1>
+<div class="board-content">
 
 <!-- Q1 -->
 <div class="question active" data-answer="false">
-  <div class="q-text">Domestic animals live in the forests.</div>
-  <div class="image-wrapper">
-    <div class="q-image"><img src="../Assets/Domestic.jpg"></div>
-  </div>
+  <div class="q-text">1. Domestic animals live in the forests.</div>
+  <div class="q-image"><img src="../Assets/Domestic.jpg"></div>
+
   <div class="tf-row">
-    <button class="tf-btn" data-value="true"><img src="../Assets/True.png">TRUE</button>
-    <button class="tf-btn" data-value="false"><img src="../Assets/False.png">FALSE</button>
+    <button class="tf-btn" data-value="true"><img src="../Assets/true.png"> TRUE</button>
+    <button class="tf-btn" data-value="false"><img src="../Assets/false.png"> FALSE</button>
   </div>
   <div class="message"></div>
 </div>
 
 <!-- Q2 -->
 <div class="question" data-answer="false">
-  <div class="q-text">Ostriches can fly.</div>
-  <div class="image-wrapper">
-    <div class="q-image"><img src="../Assets/ostrich.jpg"></div>
-  </div>
+  <div class="q-text">2. Ostriches can fly.</div>
+  <div class="q-image"><img src="../Assets/ostrich.jpg"></div>
+
   <div class="tf-row">
-    <button class="tf-btn" data-value="true"><img src="../Assets/True.png">TRUE</button>
-    <button class="tf-btn" data-value="false"><img src="../Assets/False.png">FALSE</button>
+    <button class="tf-btn" data-value="true"><img src="../Assets/true.png"> TRUE</button>
+    <button class="tf-btn" data-value="false"><img src="../Assets/false.png"> FALSE</button>
   </div>
   <div class="message"></div>
 </div>
 
 <!-- Q3 -->
 <div class="question" data-answer="false">
-  <div class="q-text">Aquatic animals live on land.</div>
-  <div class="image-wrapper">
-    <div class="q-image"><img src="../Assets/aquatic.jpg"></div>
-  </div>
+  <div class="q-text">3. Aquatic animals live on land.</div>
+  <div class="q-image"><img src="../Assets/aquatic.jpg"></div>
+
   <div class="tf-row">
-    <button class="tf-btn" data-value="true"><img src="../Assets/True.png">TRUE</button>
-    <button class="tf-btn" data-value="false"><img src="../Assets/False.png">FALSE</button>
+    <button class="tf-btn" data-value="true"><img src="../Assets/true.png"> TRUE</button>
+    <button class="tf-btn" data-value="false"><img src="../Assets/false.png"> FALSE</button>
   </div>
   <div class="message"></div>
 </div>
 
 <!-- Q4 -->
 <div class="question" data-answer="false">
-  <div class="q-text">A duck doesn't live in water.</div>
-  <div class="image-wrapper">
-    <div class="q-image"><img src="../Assets/duck.jpg"></div>
-  </div>
+  <div class="q-text">4. A duck doesn't live in water.</div>
+  <div class="q-image"><img src="../Assets/duck.jpg"></div>
+
   <div class="tf-row">
-    <button class="tf-btn" data-value="true"><img src="../Assets/True.png">TRUE</button>
-    <button class="tf-btn" data-value="false"><img src="../Assets/False.png">FALSE</button>
+    <button class="tf-btn" data-value="true"><img src="../Assets/true.png"> TRUE</button>
+    <button class="tf-btn" data-value="false"><img src="../Assets/false.png"> FALSE</button>
   </div>
   <div class="message"></div>
 </div>
 
 <!-- Q5 -->
 <div class="question" data-answer="true">
-  <div class="q-text">Some animals eat both plants and meat.</div>
-  <div class="image-wrapper">
-    <div class="q-image"><img src="../Assets/omnivore.jpg"></div>
-  </div>
+  <div class="q-text">5. Some animals eat both plants and meat.</div>
+  <div class="q-image"><img src="../Assets/omnivore.jpg"></div>
+
   <div class="tf-row">
-    <button class="tf-btn" data-value="true"><img src="../Assets/True.png">TRUE</button>
-    <button class="tf-btn" data-value="false"><img src="../Assets/False.png">FALSE</button>
+    <button class="tf-btn" data-value="true"><img src="../Assets/true.png"> TRUE</button>
+    <button class="tf-btn" data-value="false"><img src="../Assets/false.png"> FALSE</button>
   </div>
   <div class="message"></div>
 </div>
 
-<!-- Navigation buttons -->
-<button id="prevBtn" class="nav-btn">Previous</button>
-<button id="nextBtn" class="nav-btn">Next</button>
-
 </div>
 </div>
 
-<!-- Audio -->
+<!-- SOUNDS -->
 <audio id="correctSound" src="../Assets/success-340660.mp3"></audio>
 <audio id="wrongSound" src="../Assets/error-126627.mp3"></audio>
 
 <script>
-/* Auto-scale */
-function scaleQuiz(){
-  let baseW = 1000, baseH = 650;
-  let scale = Math.min(window.innerWidth/baseW, window.innerHeight/baseH);
-  document.querySelector(".scale-container").style.transform = `scale(${scale})`;
+/* CONFETTI */
+function confetti(){
+  for(let i=0;i<50;i++){
+    let c=document.createElement("div");
+    c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+    c.style.animationDuration = 1.5 + Math.random() * 1 + "s";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),3000);
+  }
 }
-scaleQuiz();
-window.onresize = scaleQuiz;
 
-/* Navigation */
+/* QUESTION NAVIGATION */
 const questions=[...document.querySelectorAll(".question")];
 let index=0;
 
@@ -301,62 +243,63 @@ const prevBtn=document.getElementById("prevBtn");
 const nextBtn=document.getElementById("nextBtn");
 
 function show(i){
-  questions.forEach((q,j)=>q.classList.toggle("active",j===i));
-  prevBtn.style.visibility = i===0 ? "hidden":"visible";
-  nextBtn.style.visibility = i===questions.length-1 ? "hidden":"visible";
+  questions.forEach((q,j)=> q.classList.toggle("active", j===i));
+  prevBtn.style.visibility = i===0 ? "hidden" : "visible";
+  nextBtn.style.visibility = i===questions.length-1 ? "hidden" : "visible";
+
+  speakQuestion();
 }
 show(index);
 
 prevBtn.onclick=()=>{ if(index>0){ index--; show(index);} }
 nextBtn.onclick=()=>{ if(index<questions.length-1){ index++; show(index);} }
 
-/* Answer checking + auto-move */
+/* SPEECH */
+function speakQuestion() {
+  const utter = new SpeechSynthesisUtterance();
+  let qText = document.querySelector(".question.active .q-text").innerText;
+  qText = qText.replace(/^\d+\.\s*/, "");
+  utter.text = qText;
+  utter.lang = "en-GB";
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
+
+window.speechSynthesis.onvoiceschanged = speakQuestion;
+
+/* ANSWERS */
 questions.forEach((q, qIndex) => {
   const correct=q.dataset.answer;
   const msg=q.querySelector(".message");
-  const btns=[...q.querySelectorAll(".tf-btn")];
+  const btns=q.querySelectorAll(".tf-btn");
 
   btns.forEach(btn=>{
     btn.onclick=()=>{
-      btns.forEach(b=>b.classList.remove("tf-correct","tf-wrong"));
+      btns.forEach(x=>x.classList.remove("tf-correct","tf-wrong"));
 
       if(btn.dataset.value===correct){
         btn.classList.add("tf-correct");
-        msg.textContent="🎉 Correct!";
-        msg.style.color="#2ecc71";
+        msg.textContent="Correct!";
+        msg.style.color="green";
         correctSound.play();
         confetti();
 
-        /* ⭐AUTO SLIDE⭐ */
         setTimeout(()=>{
           if(qIndex < questions.length - 1){
             index = qIndex + 1;
             show(index);
           }
-        },1000);
+        },900);
 
       } else {
         btn.classList.add("tf-wrong");
-        msg.textContent="❌ Try Again!";
+        msg.textContent="Wrong!";
         msg.style.color="red";
         wrongSound.play();
       }
     };
   });
 });
-
-/* Confetti */
-function confetti(){
-  for(let i=0;i<60;i++){
-    let c=document.createElement("div");
-    c.className="confetti";
-    c.style.left=Math.random()*100+"vw";
-    c.style.background=`hsl(${Math.random()*360},100%,50%)`;
-    c.style.animationDuration=1.8+Math.random()*1.5+"s";
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(),3500);
-  }
-}
 </script>
 
 </body>

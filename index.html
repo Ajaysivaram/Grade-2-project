@@ -1,125 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>01. Animal Life – Fun Activities</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animal Life – Fun Activities</title>
 
 <style>
-body {
-  margin: 0;
-  height: 100vh;
-  font-family: "Comic Sans MS", cursive;
-  display: flex;
-  flex-direction: column;
-  background: url("./assets/6140.jpg") no-repeat center center fixed;
-  background-size: cover;
-}
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
 
-/* Dark overlay */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  z-index: 1;
-}
+    html, body{
+        height:100%;
+        overflow:hidden;
+        font-family:"Comic Sans MS", cursive;
+        background:#e7f0ff; /* Soft Blue */
+    }
 
-/* Heading */
-.header {
-  position: relative;
-  z-index: 10;
-  padding: 16px;
-  text-align: center;
-  color: white;
-  font-size: 32px;
-  font-weight: bold;
-  background: linear-gradient(to right, #4a148c, #7b1fa2);
-  text-shadow: 2px 2px 10px black;
-}
+    /* ⭐ TOP BAR — Blue Theme */
+    .top-bar{
+        width:100%;
+        height:70px;
+        padding:18px;
+        font-size:30px;
+        font-weight:900;
+        text-align:center;
 
-/* Layout */
-.main {
-  flex: 1;
-  display: flex;
-  position: relative;
-  z-index: 10;
-}
+        background:#3b82f6;          /* Blue */
+        color:white;
 
-/* ⭐ INCREASED MENU BAR WIDTH */
-.sidebar {
-  width: 240px;
-  background: linear-gradient(to bottom, #4527a0, #5e35b1);
-  padding-top: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  white-space: nowrap;
-}
+        border-bottom:4px solid #00000025;
 
-/* Menu Buttons */
-.menu-btn {
-  padding: 14px 16px;
-  font-size: 18px;
-  color: white;
-  background: transparent;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-radius: 10px;
-  cursor: pointer;
-  margin: 0 14px;
-  text-align: left;
-  transition: 0.25s;
-  white-space: nowrap;
-}
+        box-shadow:
+            0 0 20px #3b82f6,
+            0 0 35px #3b82f699,
+            inset 0 0 18px #ffffffaa;
+        text-shadow:0 0 12px #ffffffcc;
+    }
 
-.menu-btn:hover {
-  background: rgba(255,255,255,0.25);
-  transform: scale(1.04);
-}
+    /* MAIN LAYOUT */
+    .main{
+        height:calc(100% - 70px);
+        display:flex;
+    }
 
-/* Content area */
-.content-area {
-  flex: 1;
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(6px);
-  margin: 18px;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-  overflow: hidden;
-}
+    /* ⭐ SIDEBAR — Blue Theme */
+    .sidebar{
+        width:260px;
+        padding:30px 15px;
+        background:#bfdbfe; /* Light Blue */
+        border-right:4px solid #00000025;
 
-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
+        box-shadow:
+            0 0 25px #bfdbfe,
+            inset 0 0 20px #ffffff88;
+    }
+
+    .menu-title{
+        font-size:26px;
+        font-weight:900;
+        color:#1e3a8a;
+        text-align:center;
+        margin-bottom:25px;
+        text-shadow:0 0 10px #ffffffdd;
+    }
+
+    /* ⭐ Buttons */
+    .menu-btn{
+        width:100%;
+        padding:16px;
+        margin-bottom:18px;
+
+        background:white;
+        border:none;
+        border-radius:16px;
+
+        font-size:20px;
+        font-weight:900;
+        cursor:pointer;
+        color:#1e3a8a;
+
+        box-shadow:0 4px 10px rgba(0,0,0,0.15);
+        transition:0.18s ease;
+    }
+
+    .menu-btn:hover{
+        background:#eaf3ff;
+        transform:scale(1.03);
+
+        box-shadow:
+            0 0 18px #93c5fd,
+            0 0 30px #bfdbfeaa,
+            inset 0 0 12px #ffffffcc;
+    }
+
+    .menu-btn.active{
+        background:#3b82f6;
+        color:white;
+        transform:scale(1.05);
+
+        box-shadow:
+            0 0 20px #3b82f6,
+            0 0 35px #3b82f6aa,
+            inset 0 0 14px #ffffffcc;
+    }
+
+    /* CONTENT AREA */
+    .content-area{
+        flex:1;
+        height:100%;
+        background:white;
+    }
+
+    iframe{
+        width:100%;
+        height:100%;
+        border:none;
+    }
 </style>
 </head>
-
 <body>
 
-<div class="overlay"></div>
-
-<div class="header">01. Animal Life – Fun Activities</div>
+<!-- TOP BAR -->
+<div class="top-bar">Animal Life – Fun Activities</div>
 
 <div class="main">
 
-  <div class="sidebar">
-    <button class="menu-btn" onclick="loadPage('./Multiple Choice/program/index.html')">📘 Multiple Choice</button>
-    <button class="menu-btn" onclick="loadPage('./True_or_False/program/index.html')">❓ True or False</button>
-    <button class="menu-btn" onclick="loadPage('./Matching/program/index.html')">🔗 Match the Following</button>
-    <button class="menu-btn" onclick="loadPage('./Fill_in_the_Blanks/program/index.html')">✏️ Fill in the Blanks</button>
-  </div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="menu-title">Activities</div>
 
-  <div class="content-area">
-    <!-- ⭐ DEFAULT: Multiple Choice loads on page open -->
-    <iframe id="contentFrame" src="./Multiple Choice/program/index.html"></iframe>
-  </div>
+        <!-- Default: Multiple Choice -->
+        <button class="menu-btn active" onclick="loadActivity('Multiple Choice/program/index.html', this)">
+            Multiple Choice
+        </button>
+
+        <button class="menu-btn" onclick="loadActivity('True_or_False/program/index.html', this)">
+            True or False
+        </button>
+
+        <button class="menu-btn" onclick="loadActivity('Matching/program/index.html', this)">
+            Matching
+        </button>
+
+        <button class="menu-btn" onclick="loadActivity('Fill_in_the_Blanks/program/index.html', this)">
+            Fill in the Blanks
+        </button>
+    </div>
+
+    <!-- RIGHT CONTENT AREA -->
+    <div class="content-area">
+        <iframe id="activityFrame" src="Multiple Choice/program/index.html"></iframe>
+    </div>
 
 </div>
 
 <script>
-function loadPage(path) {
-  document.getElementById("contentFrame").src = path;
+function loadActivity(path, btn){
+    document.getElementById("activityFrame").src = path;
+
+    document.querySelectorAll(".menu-btn")
+        .forEach(x => x.classList.remove("active"));
+    
+    btn.classList.add("active");
 }
 </script>
 
